@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\backsite\Operational;
 
+use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Http\Request;
-
 use App\Http\Controllers\Controller;
 use App\Models\Backsite\Operational\Category;
 
@@ -12,11 +12,28 @@ class CategoryController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $category = Category::get();
+        if ($request->ajax()) {
+            $data = Category::select('*');
+            return Datatables::of($data)
+                ->addIndexColumn()
+                ->addColumn('action', function($row){
+                    $btn = '<div class="btn-group">';
+                    $btn .= '<a href="'.route('category.edit', $row->id).'" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></a>';
+                    $btn .= '<form action="'.route('category.destroy', $row->id).'" method="POST" class="d-inline">';
+                    $btn .= csrf_field();
+                    $btn .= method_field('DELETE');
+                    $btn .= '<button type="submit" class="btn btn-danger btn-sm" onclick="return confirm(\'Are you sure?\')"><i class="fas fa-trash"></i></button>';
+                    $btn .= '</form>';
+                    $btn .= '</div>';
+                    return $btn;
+                })
+                ->rawColumns(['action'])
+                ->make(true);
+        }
         
-        return view('pages.backsite.operational.category.index', compact('category'));
+        return view('pages.backsite.operational.category.index');
     }
 
     /**
