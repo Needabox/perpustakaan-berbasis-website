@@ -1,14 +1,14 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
-
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\ProfileController;
+
 // Management User
-use App\Http\Controllers\backsite\ManagementUser\UserController;
+use App\Http\Controllers\Backsite\Operational\BookController;
 
 // Operational
-use App\Http\Controllers\Backsite\Operational\BookController;
+use App\Http\Controllers\backsite\ManagementUser\UserController;
 use App\Http\Controllers\backsite\Operational\CategoryController;
 
 /*

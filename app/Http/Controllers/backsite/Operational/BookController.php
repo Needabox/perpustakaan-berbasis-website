@@ -16,7 +16,12 @@ class BookController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $books = Book::with('category', 'user')->select('*');
+
+            if (auth()->user()->user_type == 2) {
+                $books = Book::with('category', 'user')->where('user_id', auth()->user()->id)->select('*');
+            } else {
+                $books = Book::with('category', 'user')->select('*');
+            }
             return Datatables::of($books)
 
                 ->addIndexColumn()
@@ -40,13 +45,10 @@ class BookController extends Controller
                 })
                 ->rawColumns(['action', 'file_path', 'image_path'])
                 ->make(true);
-
-                dd($books);
         }
         
         $categories = Category::all();
         return view('pages.backsite.operational.book.index', compact('categories'));
-        
     }
 
     /**
@@ -86,7 +88,7 @@ class BookController extends Controller
         $book->stock = $request->stock;
         $book->file_path = $file_name;
         $book->image_path = $image_name;
-        $book->user_id = 1;
+        $book->user_id = auth()->user()->id;
         $book->save();
 
         return redirect()->route('book.index')->with('success', 'Book created successfully.');
@@ -106,6 +108,9 @@ class BookController extends Controller
     public function edit(string $id)
     {
         $book = Book::find($id);
+        if ($book->user_id != auth()->user()->id || auth()->user->user_type != 1) {
+            return redirect()->route('book.index')->with('error', 'You are not authorized to update this book.');
+        }
         $categories = Category::all();
 
         return view('pages.backsite.operational.book.edit', compact('book', 'categories'));
@@ -116,6 +121,11 @@ class BookController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        $book = Book::find($id);
+        if ($book->user_id != auth()->user()->id || auth()->user->user_type != 1) {
+            return redirect()->route('book.index')->with('error', 'You are not authorized to delete this book.');
+        }
+
         $request->validate([
             'category_id' => 'required',
             'title' => 'required',
@@ -123,7 +133,6 @@ class BookController extends Controller
             'stock' => 'required',
         ]);
 
-        $book = Book::find($id);
         $book->category_id = $request->category_id;
         $book->title = $request->title;
         $book->description = $request->description;
@@ -157,6 +166,10 @@ class BookController extends Controller
     public function destroy(string $id)
     {
         $book = Book::find($id);
+        if ($book->user_id != auth()->user()->id || auth()->user->user_type != 1) {
+            return redirect()->route('book.index')->with('error', 'You are not authorized to delete this book.');
+        }
+
         $book->delete();
 
         return redirect()->route('book.index')->with('success', 'Book deleted successfully.');
