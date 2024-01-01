@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\backsite\ManagementUser\UserController;
 use App\Http\Controllers\backsite\Operational\CategoryController;
 
 /*
@@ -18,5 +19,5 @@ Route::get('/', function () {
     return view('layouts.default');
 });
 
-
+Route::resource('user', UserController::class);
 Route::resource('category', CategoryController::class);
