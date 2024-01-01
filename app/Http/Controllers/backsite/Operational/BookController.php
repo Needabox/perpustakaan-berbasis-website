@@ -7,6 +7,8 @@ use App\Http\Controllers\Controller;
 use Yajra\DataTables\Facades\DataTables;
 use App\Models\Backsite\Operational\Book;
 use App\Models\Backsite\Operational\Category;
+use OpenSpout\Common\Entity\Style\Style;
+use Rap2hpoutre\FastExcel\FastExcel;
 
 class BookController extends Controller
 {
@@ -46,7 +48,7 @@ class BookController extends Controller
                 ->rawColumns(['action', 'file_path', 'image_path'])
                 ->make(true);
         }
-        
+
         $categories = Category::all();
         return view('pages.backsite.operational.book.index', compact('categories'));
     }
@@ -142,7 +144,7 @@ class BookController extends Controller
             $file = $request->file('file_path');
             $file_name = time() . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('storage/file'), $file_name);
-            
+
             $book->file_path = $file_name;
         }
 
@@ -152,8 +154,7 @@ class BookController extends Controller
             $image->move(public_path('storage/cover'), $image_name);
 
             $book->image_path = $image_name;
-        }
-;
+        };
         $book->user_id = 1;
         $book->save();
 
@@ -173,5 +174,31 @@ class BookController extends Controller
         $book->delete();
 
         return redirect()->route('book.index')->with('success', 'Book deleted successfully.');
+    }
+
+    /**
+     * Export data to excel.
+     */
+    public function export()
+    {
+        $books = Book::with('category', 'user')->select('*')->get();
+
+        $header_style = (new Style())->setFontBold();
+
+        $rows_style = (new Style())
+            ->setShouldWrapText();
+
+        return (new FastExcel($books))
+            ->headerStyle($header_style)
+            ->rowsStyle($rows_style)
+            ->download('books.xlsx', function ($book) {
+                return [
+                    'Category' => $book->category->name,
+                    'Title' => $book->title,
+                    'Description' => $book->description,
+                    'Stock' => $book->stock,
+                    'Cover' => asset('storage/cover/' . $book->image_path),
+                ];
+            });
     }
 }

@@ -39,6 +39,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('user', UserController::class);
     
     Route::resource('category', CategoryController::class);
+    
+    Route::get('book/export', [BookController::class, 'export'])->name('book.export');
     Route::resource('book', BookController::class);
 });
 
