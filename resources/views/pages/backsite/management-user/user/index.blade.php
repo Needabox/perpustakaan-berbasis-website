@@ -7,14 +7,31 @@
     <div class="container-fluid">
 
         <!-- Page Heading -->
-        <h1 class="h3 mb-2 text-gray-800">Category</h1>
+        <h1 class="h3 mb-2 text-gray-800">Users</h1>
 
+        {{-- error --}}
+        @if ($errors->any())
+            <div class="alert bg-danger alert-dismissible mb-2" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+
+                <ul class="text-white">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        {{-- Add Data --}}
         <div class="content-body">
             <section id="add-home">
                 <div class="row">
                     <div class="col-12">
                         <div class="card">
-                            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                            <div
+                                class="card-header bg-success text-white d-flex justify-content-between align-items-center">
                                 <a class="d-flex align-items-center" data-action="collapse">
                                     <span class="fs-1 text-white">Add Data</span>
                                     <div class="heading-elements">
@@ -25,7 +42,7 @@
                                 </a>
                             </div>
                             <div class="card-body">
-                                <form class="form form-horizontal" action="{{ route('category.store') }}" method="POST"
+                                <form class="form form-horizontal" action="{{ route('user.store') }}" method="POST"
                                     enctype="multipart/form-data">
 
                                     @csrf
@@ -41,11 +58,35 @@
                                                     style="color:red;">required</code></label>
                                             <div class="col-md-9 mx-auto">
                                                 <input type="text" id="name" name="name" class="form-control"
-                                                    placeholder="example Fiksi or Non Fiksi"
-                                                    value="{{ old('name') }}" autocomplete="off" required>
+                                                    placeholder="example Tono or Hani" value="{{ old('name') }}"
+                                                    autocomplete="off" required>
                                             </div>
                                         </div>
 
+                                        <div class="form-group row">
+                                            <label class="col-md-3 label-control" for="enail">Email <code
+                                                    style="color:red;">required</code></label>
+                                            <div class="col-md-9 mx-auto">
+                                                <input type="email" id="email" name="email" class="form-control"
+                                                    placeholder="example tono@mail.com" value="{{ old('email') }}"
+                                                    autocomplete="off" required>
+                                                    @if ($errors->has('email'))
+                                                        <p style="font-style: bold; color: red;">{{ $errors->first('email') }}</p>
+                                                    @endif
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group row">
+                                            <label class="col-md-3 label-control" for="user_type">User Type <code
+                                                    style="color:red;">required</code></label>
+                                            <div class="col-md-9 mx-auto">
+                                                <select name="user_type" id="user_type" class="form-control" required>
+                                                    <option value="">Select User Type</option>
+                                                    <option value="1">Admin</option>
+                                                    <option value="2">User</option>
+                                                </select>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <div class="form-actions text-right">
@@ -63,13 +104,16 @@
             </section>
         </div>
 
+        {{-- Table Users --}}
         <div class="card shadow mb-4 mt-4">
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered" id="category-datatables" width="100%" cellspacing="0">
+                    <table class="table table-bordered" id="user-datatables" width="100%" cellspacing="0">
                         <thead>
                             <tr>
                                 <th>Name</th>
+                                <th>Email</th>
+                                <th>User Type</th>
                                 <th>Created At</th>
                                 <th>Action</th>
                             </tr>
@@ -77,29 +121,12 @@
                         <tfoot>
                             <tr>
                                 <th>Name</th>
+                                <th>Email</th>
+                                <th>User Type</th>
                                 <th>Created At</th>
                                 <th>Action</th>
                             </tr>
                         </tfoot>
-                        {{-- <tbody>
-                            @foreach ($category as $category_item)
-                                <tr>
-                                    <td>{{ $category_item->name }}</td>
-                                    <td>{{ $category_item->created_at }}</td>
-                                    <td>
-                                        <a href="{{ route('category.edit', $category_item->id) }}"
-                                            class="btn btn-warning btn-sm"><i class="fa fa-edit"></i></a>
-                                        <form action="{{ route('category.destroy', $category_item->id) }}"
-                                            method="POST" class="d-inline"
-                                            onclick="return confirm('Are you sure want to delete this data ?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger btn-sm"><i
-                                                    class="fa fa-trash"></i></button>
-                                        </form>
-                                </tr>
-                            @endforeach
-                        </tbody> --}}
                     </table>
                 </div>
             </div>
@@ -108,13 +135,15 @@
 @endsection
 
 @push('after-script')
-    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>  
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.js"></script>
     <script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous">
+    </script>
     <script src="https://cdn.datatables.net/1.11.4/js/dataTables.bootstrap5.min.js"></script>
 
-    @include('pages.backsite.operational.category.datatables.init')
+    @include('pages.backsite.management-user.user.datatables.init')
 @endpush
 
 @push('after-style')

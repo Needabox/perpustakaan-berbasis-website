@@ -83,6 +83,7 @@
 
     @include('includes.backsite.script')
 
+    @stack('after-script')
 </body>
 
 </html>
