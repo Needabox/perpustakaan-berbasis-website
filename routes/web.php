@@ -4,7 +4,11 @@ use App\Http\Controllers\ProfileController;
 
 use Illuminate\Support\Facades\Route;
 
+// Management User
 use App\Http\Controllers\backsite\ManagementUser\UserController;
+
+// Operational
+use App\Http\Controllers\Backsite\Operational\BookController;
 use App\Http\Controllers\backsite\Operational\CategoryController;
 
 /*
@@ -34,5 +38,8 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::resource('user', UserController::class);
+
+Route::resource('category', CategoryController::class);
+Route::resource('book', BookController::class);
 
 require __DIR__.'/auth.php';
